@@ -13,13 +13,33 @@ exports.coursierList = async function (req, res) {
         })
 }
 
+exports.coursierByCategory = async function (req, res) {
+    const category_name = req.params.category_name;
+
+    await Category.findByPk(category_name)
+        .then(category => {
+            if (!category) {
+                throw new Error("Category not found");
+            }
+            return category.getCoursiers();
+        })
+        .then(coursiers => {
+            console.log("Coursiers for category:", JSON.stringify(coursiers, null, 2));
+            res.json(coursiers);
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+}
+
+
 exports.coursierCreate = async (req, res) => {
     let coursier = Coursier.build({ 
         name: req.body.name, 
         adress: req.body.adress, 
         recruitment_date: req.body.recruitment_date,
         Num_tel: req.body.Num_tel,
-        category_id: req.body.category_id})
+        category_name: req.body.category_name})
     await coursier.save()
         .then(data => {
             console.log(coursier.toJSON());

@@ -4,7 +4,7 @@ const Coursier = db.Coursier;
 
 
 exports.coursierLink = async function (req, res) {
-    await Category.findAll({ include: Coursier,  where: { category_id: req.params.category_id } })
+    await Category.findAll({ include: Coursier,  where: { category_name: req.params.category_name } })
         .then(data => {
             console.log("All categories:", JSON.stringify(data, null, 2));
             res.json(data);
@@ -26,7 +26,7 @@ exports.categoryList = async function (req, res) {
 }
 
 exports.categoryCreate = async (req, res) => {
-    let category = Category.build({ name: req.body.name, description: req.body.description })
+    let category = Category.build({ category_name: req.body.category_name, description: req.body.description })
     await category.save()
         .then(data => {
             console.log(category.toJSON());
@@ -38,11 +38,11 @@ exports.categoryCreate = async (req, res) => {
 }
 
 exports.categoryUpdate = async function (req, res) {
-    if (req.params.category_id > 0) {
+    if (req.params.category_name != '') {
         await Category.update(
             {
-                name: req.body.name, description: req.body.description},
-            {   where: { category_id: req.params.category_id } }
+                category_name: req.body.category_name, description: req.body.description},
+            {   where: { category_name: req.params.category_name } }
         )
             .then(data => {
                 if (data[0] == 0) { res.status(400).json({ message: 'Not found' }) }
@@ -56,8 +56,8 @@ exports.categoryUpdate = async function (req, res) {
 }
 
 exports.categoryDelete = async function (req, res) {
-    if (req.params.category_id) {
-        await Category.destroy({ where: { category_id: req.params.category_id } })
+    if (req.params.category_name) {
+        await Category.destroy({ where: { category_name: req.params.category_name } })
             .then(data => {
                 if (data == 0) res.status(400).json({ message: 'Not found' });
                 else res.json({ message: 'done' })
@@ -70,8 +70,8 @@ exports.categoryDelete = async function (req, res) {
 }
 
 exports.categoryFindOne = async function (req, res) {
-    if (req.params.category_id) {
-        await Category.findOne({ where: { category_id: req.params.category_id } })
+    if (req.params.category_name) {
+        await Category.findOne({ where: { category_name: req.params.category_name } })
             .then(data => {
                 res.json(data);
             })

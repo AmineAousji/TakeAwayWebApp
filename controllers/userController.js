@@ -13,7 +13,9 @@ exports.userList = async function (req, res) {
 }
 
 exports.userCreate = async (req, res) => {
-    let user = User.build({ login: req.body.login, password: req.body.password })
+    let user = User.build({
+        login: req.body.login, 
+        password: req.body.password })
     await user.save()
         .then(data => {
             console.log(user.toJSON());
@@ -57,8 +59,8 @@ exports.userDelete = async function (req, res) {
 }
 
 exports.userFindOne = async function (req, res) {
-    if (req.params.id_user) {
-        await User.findOne({ where: { id_user: req.params.id_user } })
+    if (req.id_user) {
+        await User.findOne({ where: { id_user: req.id_user } })
             .then(data => {
                 res.json(data);
             })
@@ -67,4 +69,18 @@ exports.userFindOne = async function (req, res) {
             })
     }
     else res.status(400).json({ message: 'User not found' })
+}
+
+exports.checkUser = async function (req,res) {
+    console.log(req.body.login)
+    if (req.body.login && req.body.password) {
+        await User.findOne({where: {login : req.body.login, password : req.body.password}})
+        .then(data => {console.log(data)
+            res.json(data);
+            return data
+        })
+        .catch(err => {
+            res.status(500).json({message: err.message})
+        })
+    }else res.status(400).json({message: "User not found"})
 }
